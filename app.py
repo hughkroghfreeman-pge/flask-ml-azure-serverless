@@ -9,7 +9,7 @@ from sklearn.preprocessing import StandardScaler
 
 app = Flask(__name__)
 LOG = create_logger(app)
-LOG.setLevel(logging.INFO)
+LOG.setLevel(logging.DEBUG)
 
 
 def scale(payload):
@@ -62,16 +62,19 @@ def predict():
 
     try:
         clf = joblib.load("boston_housing_prediction.joblib")
+        print ('success')
     except Exception as e:
         LOG.error("Error loading model: %s", str(e))
         LOG.error("Exception traceback: %s", traceback.format_exc())
-    return "Model not loaded"
+        return "Model not loaded"
 
     json_payload = request.json
     LOG.info("JSON payload: %s json_payload")
     inference_payload = pd.DataFrame(json_payload)
     LOG.info("inference payload DataFrame: %s inference_payload")
     scaled_payload = scale(inference_payload)
+    #print (scaled_payload)
+    #return (scaled_payload)
     prediction = list(clf.predict(scaled_payload))
     return jsonify({"prediction": prediction})
 
